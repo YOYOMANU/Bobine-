@@ -1,0 +1,38 @@
+// This is your Prisma schema file,
+// learn more about it in the docs: https://pris.ly/d/prisma-schema
+
+// Get a free hosted Postgres database in seconds: `npx create-db`
+
+generator client {
+  provider = "prisma-client"
+  output   = "../app/generated/prisma"
+}
+
+datasource db {
+  provider = "sqlite"
+}
+
+model Category {
+  id         Int         @id @default(autoincrement())
+  name       String      @unique
+  watchItems WatchItem[]
+}
+
+model Tier {
+  id         Int         @id @default(autoincrement())
+  name       String      @unique
+  order      Int
+  watchItems WatchItem[]
+}
+
+model WatchItem {
+  id         Int      @id @default(autoincrement())
+  title      String
+  type       String // "film" | "serie"
+  posterUrl  String?
+  categoryId Int
+  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  tierId     Int?
+  tier       Tier?    @relation(fields: [tierId], references: [id], onDelete: Cascade)
+  createdAt  DateTime @default(now())
+}

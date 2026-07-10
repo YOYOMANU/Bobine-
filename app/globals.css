@@ -1,26 +1,867 @@
 @import "tailwindcss";
+@import "tw-animate-css";
+@import "shadcn/tailwind.css";
 
-:root {
-  --background: #ffffff;
-  --foreground: #171717;
-}
+@custom-variant dark (&:is(.dark *));
 
+/* ============================================================
+   THEME MAPPING — expose tous les tokens à Tailwind (bg-*, text-*,
+   border-*, shadow-*, rounded-*, animate-*, font-*…)
+   ============================================================ */
 @theme inline {
+  /* -- shadcn (inchangé, garanti que les composants ne cassent pas) -- */
   --color-background: var(--background);
   --color-foreground: var(--foreground);
-  --font-sans: var(--font-geist-sans);
+  --font-sans: var(--font-sans);
   --font-mono: var(--font-geist-mono);
+  --color-sidebar-ring: var(--sidebar-ring);
+  --color-sidebar-border: var(--sidebar-border);
+  --color-sidebar-accent-foreground: var(--sidebar-accent-foreground);
+  --color-sidebar-accent: var(--sidebar-accent);
+  --color-sidebar-primary-foreground: var(--sidebar-primary-foreground);
+  --color-sidebar-primary: var(--sidebar-primary);
+  --color-sidebar-foreground: var(--sidebar-foreground);
+  --color-sidebar: var(--sidebar);
+  --color-chart-5: var(--chart-5);
+  --color-chart-4: var(--chart-4);
+  --color-chart-3: var(--chart-3);
+  --color-chart-2: var(--chart-2);
+  --color-chart-1: var(--chart-1);
+  --color-ring: var(--ring);
+  --color-input: var(--input);
+  --color-border: var(--border);
+  --color-destructive: var(--destructive);
+  --color-accent-foreground: var(--accent-foreground);
+  --color-accent: var(--accent);
+  --color-muted-foreground: var(--muted-foreground);
+  --color-muted: var(--muted);
+  --color-secondary-foreground: var(--secondary-foreground);
+  --color-secondary: var(--secondary);
+  --color-primary-foreground: var(--primary-foreground);
+  --color-primary: var(--primary);
+  --color-popover-foreground: var(--popover-foreground);
+  --color-popover: var(--popover);
+  --color-card-foreground: var(--card-foreground);
+  --color-card: var(--card);
+
+  /* -- polices spécifiques au design -- */
+  --font-display: var(--font-display);
+  --font-heading: var(--font-heading);
+
+  /* -- rayons (repris tels quels du design d'origine) -- */
+  --radius-sm: 10px;
+  --radius-md: 14px;
+  --radius-lg: 20px;
+  --radius-xl: 24px;
+
+  /* -- couleurs de texte custom, exposées => text-text-secondary, text-text-muted -- */
+  --color-text-primary: var(--text-primary);
+  --color-text-secondary: var(--text-secondary);
+  --color-text-muted: var(--text-muted);
+
+  /* -- surfaces custom additionnelles => bg-surface, bg-surface-hover, border-border-light -- */
+  --color-surface: var(--surface);
+  --color-surface-hover: var(--surface-hover);
+  --color-border-light: var(--border-light);
+  --color-bg-tertiary: var(--bg-tertiary);
+
+  /* -- palette de marque, exposée => bg-brand-accent, text-brand-gold... -- */
+  --color-brand-accent: var(--brand-accent);
+  --color-brand-accent-light: var(--brand-accent-light);
+  --color-brand-accent-strong: var(--brand-accent-strong);
+  --color-brand-gold: var(--brand-gold);
+  --color-brand-gold-light: var(--brand-gold-light);
+  --color-brand-green: var(--brand-green);
+  --color-brand-red: var(--brand-red);
+  --color-brand-orange: var(--brand-orange);
+  --color-brand-blue: var(--brand-blue);
+  --color-brand-pink: var(--brand-pink);
+  --color-brand-cyan: var(--brand-cyan);
+
+  /* -- couleurs de tiers (tier list) => bg-tier-super, etc. -- */
+  --color-tier-avoir: var(--tier-avoir);
+  --color-tier-passable: var(--tier-passable);
+  --color-tier-bien: var(--tier-bien);
+  --color-tier-tresbien: var(--tier-tresbien);
+  --color-tier-adorable: var(--tier-adorable);
+  --color-tier-super: var(--tier-super);
+
+  /* -- animations nommées => animate-slide-down, animate-card-in... -- */
+  --animate-slide-down: slideDown 0.6s ease both;
+  --animate-slide-up: slideUp 0.6s ease both;
+  --animate-fade-in-up: fadeInUp 0.5s ease both;
+  --animate-fade-in: fadeIn 0.3s ease;
+  --animate-modal-in: modalIn 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+  --animate-card-in: cardIn 0.4s ease both;
+  --animate-gradient-shift: gradientShift 3s ease infinite;
+  --animate-pulse-glow: pulse 2s ease infinite;
 }
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
+/* ============================================================
+   VARIABLES BRUTES — un seul thème sombre (identité "darkroom"),
+   pas de bascule light/dark : .dark reprend les mêmes valeurs pour
+   rester compatible avec les composants shadcn qui testent .dark.
+   ============================================================ */
+:root,
+.dark {
+  /* -- surfaces shadcn mappées sur la palette du design -- */
+  --background: #06060a;
+  --foreground: #f0f0fa;
+  --card: #1a1a28;
+  --card-foreground: #f0f0fa;
+  --popover: #14141f;
+  --popover-foreground: #f0f0fa;
+  --primary: #6c5ce7;
+  --primary-foreground: #ffffff;
+  --secondary: #222236;
+  --secondary-foreground: #f0f0fa;
+  --muted: #0c0c14;
+  --muted-foreground: #6c6c88;
+  --accent: #222236;
+  --accent-foreground: #f0f0fa;
+  --destructive: #e74c3c;
+  --border: #2a2a3a;
+  --input: #2a2a3a;
+  --ring: #6c5ce7;
+  --chart-1: #6c5ce7;
+  --chart-2: #f0a500;
+  --chart-3: #2ecc71;
+  --chart-4: #3498db;
+  --chart-5: #e84393;
+  --sidebar: #0c0c14;
+  --sidebar-foreground: #f0f0fa;
+  --sidebar-primary: #6c5ce7;
+  --sidebar-primary-foreground: #ffffff;
+  --sidebar-accent: #1a1a28;
+  --sidebar-accent-foreground: #f0f0fa;
+  --sidebar-border: #2a2a3a;
+  --sidebar-ring: #6c5ce7;
+
+  /* -- polices -- */
+  --font-sans: "Inter", sans-serif;
+  --font-display: "DM Serif Display", serif;
+  --font-heading: "Space Grotesk", sans-serif;
+
+  /* -- tokens "bruts" additionnels utilisés par les composants ci-dessous -- */
+  --bg-primary: #06060a;
+  --bg-secondary: #0c0c14;
+  --bg-tertiary: #14141f;
+  --surface: #1a1a28;
+  --surface-hover: #222236;
+  --border-light: #353550;
+  --text-primary: #f0f0fa;
+  --text-secondary: #a0a0c0;
+  --text-muted: #6c6c88;
+
+  --brand-accent: #6c5ce7;
+  --brand-accent-light: #a78bfa;
+  --brand-accent-strong: #8b74f7;
+  --brand-accent-glow: rgba(108, 92, 231, 0.25);
+  --brand-gold: #f0a500;
+  --brand-gold-light: #ffc94b;
+  --brand-green: #2ecc71;
+  --brand-red: #e74c3c;
+  --brand-orange: #f39c12;
+  --brand-blue: #3498db;
+  --brand-pink: #e84393;
+  --brand-cyan: #00cec9;
+
+  --tier-avoir: #94a3b8;
+  --tier-passable: #8a7a5c;
+  --tier-bien: #3b82f6;
+  --tier-tresbien: #14b8a6;
+  --tier-adorable: #ec4899;
+  --tier-super: #f5b942;
+
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
+  --shadow-md: 0 8px 32px rgba(0, 0, 0, 0.4);
+  --shadow-lg: 0 16px 48px rgba(0, 0, 0, 0.5);
+  --shadow-glow: 0 0 40px rgba(108, 92, 231, 0.15);
+
+  --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+  --transition-bounce: all 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+}
+
+/* ============================================================
+   BASE — reset léger + fond de page (grain, dégradés radiaux)
+   ============================================================ */
+@layer base {
+  * {
+    @apply border-border outline-ring/50;
+    box-sizing: border-box;
+  }
+
+  html {
+    @apply font-sans;
+  }
+
+  body {
+    @apply bg-background text-foreground antialiased;
+    line-height: 1.6;
+    overflow-x: hidden;
+    background-image:
+      radial-gradient(
+        ellipse at 20% 0%,
+        rgba(108, 92, 231, 0.08) 0%,
+        transparent 50%
+      ),
+      radial-gradient(
+        ellipse at 80% 100%,
+        rgba(240, 165, 0, 0.05) 0%,
+        transparent 50%
+      );
+  }
+
+  /* respecte prefers-reduced-motion : coupe toutes les animations custom */
+  @media (prefers-reduced-motion: reduce) {
+    *,
+    *::before,
+    *::after {
+      animation-duration: 0.01ms !important;
+      animation-iteration-count: 1 !important;
+      transition-duration: 0.01ms !important;
+    }
   }
 }
 
-body {
-  background: var(--background);
-  color: var(--foreground);
-  font-family: Arial, Helvetica, sans-serif;
+/* ============================================================
+   KEYFRAMES — déclarés hors des layers, réutilisés via animate-*
+   ============================================================ */
+@keyframes gradientShift {
+  0%,
+  100% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+}
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes slideUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fadeInUp {
+  from {
+    opacity: 0;
+    transform: translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+@keyframes fadeIn {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+@keyframes modalIn {
+  from {
+    opacity: 0;
+    transform: scale(0.9) translateY(30px);
+  }
+  to {
+    opacity: 1;
+    transform: scale(1) translateY(0);
+  }
+}
+@keyframes cardIn {
+  from {
+    opacity: 0;
+    transform: translateY(10px) scale(0.95);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0) scale(1);
+  }
+}
+@keyframes pulse {
+  0%,
+  100% {
+    box-shadow: 0 0 20px rgba(240, 165, 0, 0.3);
+  }
+  50% {
+    box-shadow: 0 0 40px rgba(240, 165, 0, 0.5);
+  }
+}
+
+/* ============================================================
+   COMPONENTS — chaque bloc du design d'origine, en classes utilitaires
+   Tailwind + @apply, complétées de CSS brut pour ce que Tailwind ne
+   fait pas nativement (dégradés de texte, ::before/::after, grain…).
+   Tout est scopé à des classes custom : rien ne touche les balises
+   brutes (button/input) donc les composants shadcn ne sont pas cassés.
+   ============================================================ */
+@layer components {
+  /* -- grain de fond -- */
+  .grain {
+    @apply fixed inset-0 pointer-events-none z-0;
+    opacity: 0.025;
+    mix-blend-mode: overlay;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  }
+
+  /* -- conteneur principal -- */
+  .app {
+    @apply relative z-10 mx-auto w-full;
+    max-width: 1440px;
+    padding: clamp(20px, 4vw, 36px) clamp(14px, 3vw, 28px) 120px;
+  }
+
+  /* -- header -- */
+  .header {
+    @apply flex items-center justify-between gap-5 mb-10
+           bg-popover border border-border rounded-xl shadow-md
+           backdrop-blur-xl animate-slide-down;
+    padding: clamp(16px, 3vw, 24px) clamp(16px, 4vw, 32px);
+  }
+  @media (max-width: 768px) {
+    .header {
+      @apply flex-col items-start;
+    }
+    .header-actions {
+      @apply w-full;
+    }
+  }
+
+  .brand {
+    @apply flex items-center gap-4;
+  }
+
+  .logo {
+    @apply font-display italic;
+    font-size: clamp(26px, 4vw, 38px);
+    font-weight: 400;
+    letter-spacing: -1px;
+    background: linear-gradient(
+      135deg,
+      var(--brand-accent-light),
+      var(--brand-gold-light),
+      var(--brand-accent-light)
+    );
+    background-size: 200% 200%;
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+    animation: var(--animate-gradient-shift);
+  }
+
+  .badge {
+    @apply text-brand-accent-light text-[11px] font-semibold uppercase tracking-[2px]
+           rounded-full backdrop-blur-md;
+    padding: 8px 18px;
+    background: linear-gradient(
+      135deg,
+      rgba(108, 92, 231, 0.2),
+      rgba(167, 139, 250, 0.1)
+    );
+    border: 1px solid rgba(108, 92, 231, 0.3);
+  }
+
+  .header-actions {
+    @apply flex gap-3;
+  }
+
+  /* -- boutons custom (à côté des <Button> shadcn, pas à la place) -- */
+  .btn {
+    @apply flex items-center gap-2 rounded-full border-2 border-border bg-card
+           text-text-secondary text-[13px] font-semibold tracking-[0.5px]
+           px-5 py-2.5 cursor-pointer transition-transform duration-300;
+  }
+  .btn:hover {
+    @apply border-brand-accent text-foreground -translate-y-0.5;
+  }
+
+  .btn-accent {
+    @apply text-white border-transparent;
+    background: linear-gradient(
+      135deg,
+      var(--brand-accent),
+      var(--brand-accent-strong)
+    );
+    box-shadow: 0 4px 20px var(--brand-accent-glow);
+  }
+  .btn-accent:hover {
+    box-shadow: 0 8px 30px rgba(108, 92, 231, 0.4);
+  }
+
+  .btn-primary {
+    @apply flex-1 rounded-full text-white text-sm font-semibold uppercase tracking-[1.5px]
+           border-none px-4 py-3.5 cursor-pointer transition-all duration-300;
+    background: linear-gradient(
+      135deg,
+      var(--brand-accent),
+      var(--brand-accent-strong)
+    );
+    box-shadow: 0 4px 20px var(--brand-accent-glow);
+  }
+  .btn-primary:hover {
+    @apply -translate-y-0.5;
+    box-shadow: 0 8px 30px rgba(108, 92, 231, 0.4);
+  }
+
+  .btn-danger {
+    @apply bg-transparent text-destructive border-2 border-destructive rounded-full
+           text-[13px] font-semibold px-5 py-3.5 cursor-pointer transition-colors duration-300;
+  }
+  .btn-danger:hover {
+    @apply bg-destructive text-white;
+  }
+
+  /* -- stats -- */
+  .stats-grid {
+    @apply grid gap-4 mb-8 animate-slide-up;
+    grid-template-columns: repeat(auto-fit, minmax(140px, 1fr));
+  }
+  @media (max-width: 768px) {
+    .stats-grid {
+      @apply grid-cols-2 gap-2.5;
+    }
+  }
+
+  .stat-card {
+    @apply relative overflow-hidden bg-card border border-border rounded-lg
+           transition-transform duration-300;
+    padding: clamp(16px, 2vw, 24px) clamp(14px, 2vw, 20px);
+  }
+  .stat-card:hover {
+    @apply -translate-y-1 border-brand-accent;
+    box-shadow: var(--shadow-lg), var(--shadow-glow);
+  }
+  .stat-card::before {
+    content: "";
+    @apply absolute -inset-1/2 opacity-0 transition-opacity duration-300;
+    background: radial-gradient(
+      circle,
+      rgba(108, 92, 231, 0.1) 0%,
+      transparent 70%
+    );
+  }
+  .stat-card:hover::before {
+    @apply opacity-100;
+  }
+
+  .stat-value {
+    @apply relative z-10 font-heading font-bold;
+    font-size: clamp(22px, 3vw, 36px);
+    background: linear-gradient(
+      135deg,
+      var(--text-primary),
+      var(--brand-accent-light)
+    );
+    -webkit-background-clip: text;
+    background-clip: text;
+    -webkit-text-fill-color: transparent;
+  }
+
+  .stat-label {
+    @apply relative z-10 text-[11px] text-text-muted uppercase tracking-[2px] font-semibold mt-1.5;
+  }
+
+  .stat-icon {
+    @apply absolute top-5 right-5 z-10 text-2xl opacity-30 transition-transform duration-300;
+  }
+  .stat-card:hover .stat-icon {
+    @apply opacity-60 scale-110 -rotate-[10deg];
+  }
+
+  /* -- toolbar / recherche / toggle type -- */
+  .toolbar {
+    @apply flex flex-wrap items-center gap-4 mb-5 animate-slide-up;
+  }
+
+  .search-wrapper {
+    @apply relative flex-1 min-w-[220px] max-w-[340px];
+  }
+
+  .search-icon {
+    @apply absolute left-4 top-1/2 -translate-y-1/2 text-text-muted pointer-events-none transition-colors duration-300;
+  }
+
+  .search-input {
+    @apply w-full bg-card border-2 border-border rounded-full text-foreground text-sm font-medium
+           py-3 pl-[46px] pr-[18px] transition-all duration-300 outline-none;
+  }
+  .search-input:focus {
+    @apply border-brand-accent;
+    box-shadow: 0 0 30px var(--brand-accent-glow);
+  }
+  .search-input:focus ~ .search-icon {
+    @apply text-brand-accent-light;
+  }
+  .search-input::placeholder {
+    @apply text-text-muted font-normal;
+  }
+
+  .type-toggle {
+    @apply flex gap-1 bg-popover p-[5px] rounded-full border border-border;
+  }
+  .type-toggle button {
+    @apply bg-transparent border-none text-text-secondary text-[13px] font-semibold tracking-[0.5px]
+           rounded-full px-[22px] py-2.5 cursor-pointer whitespace-nowrap transition-colors duration-300;
+  }
+  .type-toggle button:hover {
+    @apply text-foreground;
+  }
+  .type-toggle button.active {
+    @apply text-white;
+    background: linear-gradient(
+      135deg,
+      var(--brand-accent),
+      var(--brand-accent-strong)
+    );
+    box-shadow: 0 4px 20px var(--brand-accent-glow);
+  }
+
+  /* -- genres / chips -- */
+  .genres {
+    @apply flex flex-wrap gap-2.5 mb-9 animate-fade-in-up;
+  }
+
+  .chip {
+    @apply bg-transparent border-2 rounded-full text-text-secondary text-[13px] font-medium
+           tracking-[0.3px] px-[22px] py-2.5 cursor-pointer transition-all duration-300;
+    border-color: var(--border-light);
+  }
+  .chip:hover {
+    @apply border-brand-accent text-foreground -translate-y-0.5;
+  }
+  .chip.active {
+    @apply text-white border-transparent;
+    background: linear-gradient(
+      135deg,
+      var(--brand-accent),
+      var(--brand-accent-strong)
+    );
+    box-shadow: 0 4px 20px var(--brand-accent-glow);
+  }
+
+  /* -- tiers -- */
+  .tier {
+    @apply mb-10 animate-fade-in-up;
+  }
+
+  .tier-head {
+    @apply flex items-center gap-3.5 mb-5 px-6 py-4 bg-popover border border-border
+           rounded-lg transition-colors duration-300;
+  }
+  .tier-head:hover {
+    @apply border-brand-accent;
+  }
+
+  .tier-dot {
+    @apply w-3 h-3 rounded-full shrink-0;
+    box-shadow: 0 0 12px currentColor;
+  }
+
+  .tier-name {
+    @apply font-heading text-xl font-semibold text-foreground;
+  }
+
+  .tier-count {
+    @apply bg-card border border-border text-text-secondary text-[13px] font-semibold
+           rounded-full px-4 py-1.5;
+  }
+
+  .tier-row {
+    @apply flex gap-5 overflow-x-auto p-2 rounded-lg border-2 border-dashed border-transparent
+           items-start transition-colors duration-300;
+    min-height: 100px;
+    scroll-snap-type: x proximity;
+  }
+  .tier-row::-webkit-scrollbar {
+    height: 6px;
+  }
+  .tier-row::-webkit-scrollbar-thumb {
+    @apply bg-secondary rounded-[10px];
+  }
+  .tier-row.drag-over {
+    @apply border-brand-accent;
+    background: rgba(108, 92, 231, 0.05);
+    box-shadow: inset 0 0 40px rgba(108, 92, 231, 0.05);
+  }
+
+  .tier-empty {
+    @apply text-sm text-text-muted italic px-6 py-10 whitespace-nowrap opacity-60;
+  }
+
+  /* -- cartes (films / séries) -- */
+  .card {
+    @apply relative shrink-0 cursor-grab transition-transform duration-300 animate-card-in;
+    width: clamp(140px, 22vw, 180px);
+    scroll-snap-align: start;
+  }
+  .card:active {
+    @apply cursor-grabbing;
+  }
+  .card:hover {
+    @apply -translate-y-1.5 z-10;
+  }
+  .card.dragging {
+    @apply opacity-40 scale-90 rotate-2;
+  }
+
+  .poster {
+    @apply relative flex items-end rounded-md overflow-hidden p-3.5 transition-shadow duration-300;
+    height: clamp(170px, 30vw, 250px);
+    box-shadow: var(--shadow-md);
+  }
+  .card:hover .poster {
+    box-shadow:
+      var(--shadow-lg),
+      0 0 40px rgba(108, 92, 231, 0.2);
+  }
+  .poster::after {
+    content: "";
+    @apply absolute inset-0 transition-colors duration-300;
+    background: linear-gradient(
+      180deg,
+      transparent 30%,
+      rgba(6, 6, 10, 0.95) 100%
+    );
+  }
+  .card:hover .poster::after {
+    background: linear-gradient(
+      180deg,
+      transparent 20%,
+      rgba(6, 6, 10, 0.9) 100%
+    );
+  }
+
+  .poster-overlay {
+    @apply absolute inset-0 opacity-0 transition-opacity duration-300;
+    background: rgba(108, 92, 231, 0.1);
+  }
+  .card:hover .poster-overlay {
+    @apply opacity-100;
+  }
+
+  .poster .title {
+    @apply relative z-10 font-heading font-semibold text-sm text-white leading-snug;
+    text-shadow: 0 2px 8px rgba(0, 0, 0, 0.8);
+  }
+
+  .type-badge {
+    @apply absolute top-2.5 left-2.5 z-10 text-[9px] font-bold uppercase tracking-wider
+           text-text-secondary rounded-full px-2.5 py-1 backdrop-blur-md border border-white/10;
+    background: rgba(10, 10, 18, 0.7);
+  }
+
+  .fav-btn {
+    @apply absolute top-2.5 right-2.5 z-10 w-[30px] h-[30px] rounded-full text-sm
+           flex items-center justify-center cursor-pointer transition-transform duration-300
+           text-white/40 border border-white/15 backdrop-blur-md;
+    background: rgba(10, 10, 18, 0.6);
+  }
+  .fav-btn:hover {
+    @apply scale-110;
+    background: rgba(10, 10, 18, 0.8);
+  }
+  .fav-btn.active {
+    @apply text-brand-gold-light border-brand-gold animate-pulse-glow;
+    background: rgba(240, 165, 0, 0.2);
+  }
+
+  .meta {
+    @apply flex items-center justify-between mt-2.5 px-0.5;
+  }
+
+  .genre-tag {
+    @apply text-[11px] text-text-muted uppercase tracking-wider font-semibold;
+  }
+
+  /* -- bouton flottant -- */
+  .fab {
+    @apply fixed bottom-9 right-9 w-[60px] h-[60px] rounded-full text-white border-none
+           text-[26px] font-light cursor-pointer flex items-center justify-center z-50
+           transition-transform duration-300;
+    background: linear-gradient(
+      135deg,
+      var(--brand-accent),
+      var(--brand-accent-strong)
+    );
+    box-shadow: 0 12px 40px rgba(108, 92, 231, 0.4);
+  }
+  .fab:hover {
+    @apply scale-110 rotate-90;
+    box-shadow: 0 16px 60px rgba(108, 92, 231, 0.6);
+  }
+
+  /* -- overlay / modal -- */
+  .overlay {
+    @apply fixed inset-0 hidden items-center justify-center z-[200] p-5;
+    background: rgba(0, 0, 0, 0.85);
+    backdrop-filter: blur(8px);
+  }
+  .overlay.show {
+    @apply flex animate-fade-in;
+  }
+
+  .modal {
+    @apply relative w-full rounded-xl border p-8 overflow-y-auto animate-modal-in;
+    background: var(--bg-tertiary);
+    border-color: var(--border-light);
+    max-width: 480px;
+    max-height: 90vh;
+    box-shadow:
+      var(--shadow-lg),
+      0 0 80px rgba(108, 92, 231, 0.1);
+  }
+
+  .modal-header {
+    @apply flex items-center justify-between mb-6;
+  }
+  .modal-title {
+    @apply font-heading text-[22px] font-semibold;
+  }
+
+  .modal-close {
+    @apply w-9 h-9 rounded-full bg-card border border-border text-text-muted text-lg
+           cursor-pointer flex items-center justify-center transition-colors duration-300;
+  }
+  .modal-close:hover {
+    @apply bg-destructive text-white border-destructive;
+  }
+
+  /* -- formulaires custom (à côté de <Input>/<Select> shadcn) -- */
+  .form-group {
+    @apply mb-5;
+  }
+
+  .form-label {
+    @apply block text-[11px] text-text-muted uppercase tracking-[2px] font-bold mb-2.5;
+  }
+
+  .form-input,
+  .form-select {
+    @apply w-full bg-popover border-2 border-border rounded-sm text-foreground text-sm font-medium
+           px-4 py-3 transition-all duration-300 outline-none;
+  }
+  .form-input:focus,
+  .form-select:focus {
+    @apply border-brand-accent;
+    box-shadow: 0 0 20px var(--brand-accent-glow);
+  }
+
+  .form-select {
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 12 12'%3E%3Cpath d='M6 8L1 3h10z' fill='%236c6c88'/%3E%3C/svg%3E");
+    background-repeat: no-repeat;
+    background-position: right 16px center;
+    padding-right: 40px;
+  }
+
+  .field-row {
+    @apply flex gap-3.5;
+  }
+  .field-row .form-group {
+    @apply flex-1;
+  }
+
+  .form-actions {
+    @apply flex gap-3 mt-7;
+  }
+
+  /* -- gestion des catégories -- */
+  .cat-list {
+    @apply flex flex-col gap-2.5 mb-5;
+  }
+
+  .cat-row {
+    @apply flex items-center justify-between bg-popover border border-border rounded-sm
+           px-4 py-3 transition-colors duration-300;
+  }
+  .cat-row:hover {
+    @apply border-brand-accent;
+  }
+  .cat-row span {
+    @apply text-sm font-medium;
+  }
+
+  .cat-del {
+    @apply bg-transparent border-none text-text-muted cursor-pointer text-base
+           w-7 h-7 rounded-full flex items-center justify-center transition-colors duration-300;
+  }
+  .cat-del:hover {
+    @apply text-destructive;
+    background: rgba(231, 76, 60, 0.1);
+  }
+
+  .cat-add {
+    @apply flex gap-2.5;
+  }
+  .cat-add input {
+    @apply flex-1 bg-popover border-2 border-border rounded-sm text-foreground text-sm
+           px-4 py-3 outline-none transition-colors duration-300;
+  }
+  .cat-add input:focus {
+    @apply border-brand-accent;
+  }
+
+  /* -- upload d'image -- */
+  .image-upload-area {
+    @apply border-2 border-dashed rounded-md text-center cursor-pointer p-5 mb-5
+           bg-popover transition-all duration-300;
+    border-color: var(--border-light);
+  }
+  .image-upload-area:hover {
+    @apply border-brand-accent bg-bg-tertiary;
+    box-shadow: 0 0 30px var(--brand-accent-glow);
+  }
+
+  .image-preview {
+    @apply hidden w-full h-[180px] object-cover rounded-sm mb-3;
+  }
+  .image-upload-area.has-image .image-preview {
+    @apply block;
+  }
+
+  .image-url-input {
+    @apply w-full bg-bg-tertiary border border-border rounded-sm text-foreground text-[13px]
+           p-2.5 mt-3 outline-none transition-colors duration-300;
+  }
+  .image-url-input:focus {
+    @apply border-brand-accent;
+  }
+
+  /* -- toast -- */
+  .toast {
+    @apply fixed bottom-9 left-9 rounded-full border-2 border-brand-accent text-foreground
+           text-sm font-medium px-7 py-4 z-[300] pointer-events-none opacity-0 translate-y-5
+           transition-all duration-300;
+    background: var(--surface);
+    box-shadow: var(--shadow-lg);
+  }
+  .toast.show {
+    @apply opacity-100 translate-y-0;
+  }
+
+  /* -- responsive additionnel (cartes / posters plus petits sur mobile) -- */
+  @media (max-width: 768px) {
+    .toolbar {
+      @apply flex-col;
+    }
+    .search-wrapper {
+      @apply max-w-full;
+    }
+  }
 }
