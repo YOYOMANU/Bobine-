@@ -18,21 +18,29 @@ model Category {
   watchItems WatchItem[]
 }
 
+enum WatchType {
+  film
+  serie
+}
+
 model Tier {
   id         Int         @id @default(autoincrement())
   name       String      @unique
   order      Int
+  score      Int?
   watchItems WatchItem[]
 }
 
 model WatchItem {
-  id         Int      @id @default(autoincrement())
+  id         Int        @id @default(autoincrement())
   title      String
-  type       String // "film" | "serie"
+  type       WatchType
+  favorite   Boolean    @default(false)
+  position   Int        @default(0)
+  image      String?
   posterUrl  String?
-  categoryId Int
-  category   Category @relation(fields: [categoryId], references: [id], onDelete: Cascade)
+  categories Category[]
   tierId     Int?
-  tier       Tier?    @relation(fields: [tierId], references: [id], onDelete: Cascade)
-  createdAt  DateTime @default(now())
+  tier       Tier?      @relation(fields: [tierId], references: [id], onDelete: SetNull)
+  createdAt  DateTime   @default(now())
 }

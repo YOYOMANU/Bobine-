@@ -7,4 +7,4 @@ export const tiersConfig: TierConfig[] = [
     { key: "tresbien", label: "Très bien", color: "var(--tier-tresbien)", icon: "✨", score: 3 },
     { key: "bien", label: "Bien", color: "var(--tier-bien)", icon: "👍", score: 2 },
     { key: "passable", label: "Passable", color: "var(--tier-passable)", icon: "👀", score: 1 },
-];
+];  

@@ -1,14 +1,22 @@
 import { prisma } from "@/lib/prisma";
 
 export async function seedCategories() {
-    const categories = await prisma.category.createMany({
-        data: [
-            { name: "Action" },
-            { name: "Science-Fiction" },
-            { name: "Drame" },
-            { name: "Comédie" },
-        ],
-    });
+    const categories = [
+        { name: "Drame" },
+        { name: "Science-fiction" },
+        { name: "Thriller" },
+        { name: "Animation" },
+        { name: "Cinéma africain" },
+        { name: "Comédie" },
+    ];
 
-    console.log(`✅ ${categories.count} catégories créées`);
+    for (const category of categories) {
+        await prisma.category.upsert({
+            where: { name: category.name },
+            update: {},
+            create: category,
+        });
+    }
+
+    console.log(`✅ ${categories.length} catégories créées`);
 }

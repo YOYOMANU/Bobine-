@@ -1,11 +1,13 @@
-"use client"
-import { Dispatch, SetStateAction, useState } from "react";
-import { ImageIcon, Save } from "lucide-react";
+"use client";
+import { Dispatch, SetStateAction, useEffect, useState } from "react";
+import { Save, Loader2, Trash2 } from "lucide-react";
+import { toast } from "sonner";
 import {
     Dialog,
     DialogContent,
     DialogHeader,
     DialogTitle,
+    DialogFooter,
 } from "@/components/ui/dialog";
 import { Label } from "@/components/ui/label";
 import { Input } from "@/components/ui/input";
@@ -17,73 +19,187 @@ import {
     SelectTrigger,
     SelectValue,
 } from "@/components/ui/select";
+import {
+    addWatchItem,
+    deleteWatchItem,
+    getCategories,
+    getTiers,
+    updateWatchItem,
+} from "@/lib/actions";
+import { Category, ItemType, Tier, WatchItem } from "@/types";
+import ImageDropzone from "./image-dropzone";
+import GenreMultiSelect from "./genre-multi-select";
 
 type Props = {
     open: boolean;
-    setOpen: Dispatch<SetStateAction<boolean>>
+    setOpen: Dispatch<SetStateAction<boolean>>;
+    item?: WatchItem | null;
+    onSuccess?: () => void;
+};
+
+interface FormState {
+    title: string;
+    type: ItemType;
+    categoryIds: string[];
+    tierId: string;
+    posterUrl: string;
 }
 
-export default function FormWatch({ open, setOpen }: Props) {
-    const [imageUrl, setImageUrl] = useState("");
+const EMPTY_FORM: FormState = {
+    title: "",
+    type: "film",
+    categoryIds: [],
+    tierId: "",
+    posterUrl: "",
+};
+
+function itemToFormState(item: WatchItem): FormState {
+    return {
+        title: item.title,
+        type: item.type,
+        categoryIds: (item.categories ?? []).map((c) => String(c.id)),
+        tierId: item.tierId ? String(item.tierId) : "",
+        posterUrl: item.posterUrl ?? "",
+    };
+}
+
+export default function FormWatch({ open, setOpen, item, onSuccess }: Props) {
+    const isEditMode = !!item;
+
+    const [categories, setCategories] = useState<Category[]>([]);
+    const [tiers, setTiers] = useState<Tier[]>([]);
+    const [form, setForm] = useState<FormState>(EMPTY_FORM);
+    const [saving, setSaving] = useState(false);
+    const [deleting, setDeleting] = useState(false);
+    const [error, setError] = useState<string | null>(null);
+
+    const load = async () => {
+        const [cats, tiersList] = await Promise.all([getCategories(), getTiers()]);
+        setCategories(cats);
+        setTiers(tiersList);
+    };
+
+    useEffect(() => {
+        load();
+    }, []);
+
+    useEffect(() => {
+        if (open) {
+            setForm(item ? itemToFormState(item) : EMPTY_FORM);
+            setError(null);
+        }
+    }, [open, item]);
+
+    const canSave = form.title.trim().length > 0 && (form.categoryIds?.length ?? 0) > 0;
+
+    const buildFormData = () => {
+        const selectedCategories = categories.filter((c) =>
+            form.categoryIds.includes(String(c.id))
+        );
+
+        const formData = new FormData();
+        formData.set("title", form.title.trim());
+        formData.set("type", form.type);
+        form.categoryIds.forEach((id) => formData.append("categoryIds[]", id));
+        selectedCategories.forEach((c) => formData.append("genres[]", c.name));
+        if (form.tierId) formData.set("tierId", form.tierId);
+        if (form.posterUrl.trim()) formData.set("posterUrl", form.posterUrl.trim());
+        return formData;
+    };
+
+    const handleSave = async () => {
+        if (!canSave || saving) return;
+        setSaving(true);
+        setError(null);
+
+        const formData = buildFormData();
+        const title = form.title.trim();
+
+        try {
+            if (isEditMode && item) {
+                await updateWatchItem(item.id, formData);
+                toast.success(`« ${title} » a été modifié.`);
+            } else {
+                await addWatchItem(formData);
+                toast.success(`« ${title} » a été ajouté.`);
+            }
+            setOpen(false);
+            onSuccess?.();
+        } catch (err) {
+            console.error(err);
+            const message =
+                err instanceof Error ? err.message : "Erreur lors de l'enregistrement.";
+            setError(message);
+            toast.error(message);
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleDelete = async () => {
+        if (!item || deleting) return;
+        const confirmed = window.confirm(
+            `Supprimer « ${item.title} » ? Cette action est irréversible.`
+        );
+        if (!confirmed) return;
+
+        setDeleting(true);
+        setError(null);
+
+        try {
+            await deleteWatchItem(item.id);
+            toast.success(`« ${item.title} » a été supprimé.`);
+            setOpen(false);
+            onSuccess?.();
+        } catch (err) {
+            console.error(err);
+            const message =
+                err instanceof Error ? err.message : "Erreur lors de la suppression.";
+            setError(message);
+            toast.error(message);
+        } finally {
+            setDeleting(false);
+        }
+    };
 
     return (
         <Dialog open={open} onOpenChange={setOpen}>
-            <DialogContent className="modal" id="overlay-form">
-                <DialogHeader className="modal-header">
-                    <DialogTitle className="modal-title" id="form-title">
-                        Ajouter un titre
+            <DialogContent className="max-w-2xl max-h-[85vh] overflow-y-auto p-6 dialog-scroll">
+                <DialogHeader>
+                    <DialogTitle id="form-title" className="text-xl font-semibold pr-6">
+                        {isEditMode ? "Modifier un titre" : "Ajouter un titre"}
                     </DialogTitle>
                 </DialogHeader>
 
-                {/* Image Upload */}
-                <div className="form-group">
-                    <Label className="form-label">Affiche</Label>
-                    <div
-                        className="image-upload-area"
-                        id="image-upload-area"
-                        onClick={() =>
-                            document.getElementById("image-url-input")?.focus()
-                        }
-                    >
-                        {imageUrl && (
-                            <img
-                                className="image-preview"
-                                id="image-preview"
-                                src={imageUrl}
-                                alt="Aperçu"
-                            />
-                        )}
-                        <div className="text-muted-foreground text-[13px] flex items-center gap-1.5 justify-center">
-                            <ImageIcon className="size-4" />
-                            Cliquez pour ajouter une URL d'image
-                        </div>
-                        <Input
-                            type="text"
-                            className="image-url-input"
-                            id="image-url-input"
-                            placeholder="Collez l'URL de l'image..."
-                            value={imageUrl}
-                            onChange={(e) => setImageUrl(e.target.value)}
-                            onClick={(e) => e.stopPropagation()}
+                <div className="flex flex-col gap-4 mt-2">
+                    <div className="flex flex-col gap-2">
+                        <Label>Affiche</Label>
+                        <ImageDropzone
+                            value={form.posterUrl}
+                            onChange={(value) => setForm((f) => ({ ...f, posterUrl: value }))}
                         />
                     </div>
-                </div>
 
-                <div className="form-group">
-                    <Label className="form-label">Titre</Label>
-                    <Input
-                        type="text"
-                        className="form-input"
-                        id="f-title"
-                        placeholder="Ex: Dune: Part Two"
-                    />
-                </div>
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="title">Titre</Label>
+                        <Input
+                            type="text"
+                            id="title"
+                            placeholder="Ex: Dune: Part Two"
+                            value={form.title}
+                            onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+                        />
+                    </div>
 
-                <div className="field-row">
-                    <div className="form-group">
-                        <Label className="form-label">Type</Label>
-                        <Select defaultValue="film">
-                            <SelectTrigger className="form-select" id="f-type">
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="type">Type</Label>
+                        <Select
+                            value={form.type}
+                            onValueChange={(value) =>
+                                setForm((f) => ({ ...f, type: value as ItemType }))
+                            }
+                        >
+                            <SelectTrigger id="type" className="w-full">
                                 <SelectValue />
                             </SelectTrigger>
                             <SelectContent>
@@ -92,37 +208,69 @@ export default function FormWatch({ open, setOpen }: Props) {
                             </SelectContent>
                         </Select>
                     </div>
-                    <div className="form-group">
-                        <Label className="form-label">Genre</Label>
-                        <Select>
-                            <SelectTrigger className="form-select" id="f-genre">
-                                <SelectValue placeholder="Choisir un genre" />
+
+                    <div className="flex flex-col gap-2">
+                        <Label>Genres</Label>
+                        <GenreMultiSelect
+                            categories={categories}
+                            value={form.categoryIds}
+                            onChange={(ids) => setForm((f) => ({ ...f, categoryIds: ids }))}
+                        />
+                    </div>
+
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="f-tier">Classement</Label>
+                        <Select
+                            value={form.tierId}
+                            onValueChange={(value) => setForm((f) => ({ ...f, tierId: value ?? "" }))}
+                        >
+                            <SelectTrigger id="f-tier" className="w-full">
+                                <SelectValue placeholder="Choisir un tier (optionnel)" />
                             </SelectTrigger>
                             <SelectContent>
-                                {/* options générées dynamiquement */}
+                                {tiers.map((tier) => (
+                                    <SelectItem key={tier.id} value={String(tier.id)}>
+                                        {tier.name}
+                                    </SelectItem>
+                                ))}
                             </SelectContent>
                         </Select>
                     </div>
+
+                    {error && <p className="text-sm text-destructive">{error}</p>}
                 </div>
 
-                <div className="form-group">
-                    <Label className="form-label">Classement</Label>
-                    <Select>
-                        <SelectTrigger className="form-select" id="f-tier">
-                            <SelectValue placeholder="Choisir un tier" />
-                        </SelectTrigger>
-                        <SelectContent>
-                            {/* options générées dynamiquement */}
-                        </SelectContent>
-                    </Select>
-                </div>
-
-                <div className="form-actions">
-                    <Button className="btn-primary" id="save-btn">
-                        <Save className="size-4" />
+                <DialogFooter className="mt-6 flex-row gap-2 sm:justify-between">
+                    {isEditMode ? (
+                        <Button
+                            type="button"
+                            variant="destructive"
+                            onClick={handleDelete}
+                            disabled={deleting || saving}
+                        >
+                            {deleting ? (
+                                <Loader2 className="size-4 animate-spin" />
+                            ) : (
+                                <Trash2 className="size-4" />
+                            )}
+                            Supprimer
+                        </Button>
+                    ) : (
+                        <span />
+                    )}
+                    <Button
+                        id="save-btn"
+                        onClick={handleSave}
+                        disabled={!canSave || saving || deleting}
+                    >
+                        {saving ? (
+                            <Loader2 className="size-4 animate-spin" />
+                        ) : (
+                            <Save className="size-4" />
+                        )}
                         Enregistrer
                     </Button>
-                </div>
+                </DialogFooter>
             </DialogContent>
         </Dialog>
     );

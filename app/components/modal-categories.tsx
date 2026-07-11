@@ -9,9 +9,9 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Dispatch, SetStateAction, useEffect, useState } from "react";
-import { Category } from "@/types";
 import { addCategory, deleteCategory, getCategories } from "@/lib/actions";
-import { redirect, useRouter } from "next/navigation";
+import { useRouter } from "next/navigation";
+import { Category } from "@/types";
 
 type Props = {
     open: boolean;
@@ -31,6 +31,7 @@ export default function ModalCategories({ open, setOpen }: Props) {
     useEffect(() => {
         loadCategories()
     }, []);
+
 
     const handleCreateCategory = async () => {
         await addCategory(newCat);
