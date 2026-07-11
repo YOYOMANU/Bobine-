@@ -15,6 +15,7 @@ import {
 import WatchItemDetails from "./watch-item-detail";
 import SearchBar, { type TypeFilter } from "./search-bar";
 import GenreChips from "./genre-chips";
+import { Stats } from "./render-stats";
 
 export function WatchlistBoard() {
     const [tiers, setTiers] = useState<Tier[]>([]);
@@ -43,6 +44,10 @@ export function WatchlistBoard() {
     useEffect(() => {
         load();
     }, []);
+
+    const allWatchItems = useMemo(() => {
+    return tiers.flatMap((t) => t.watchItems ?? []);
+}, [tiers]);
 
     // Tiers affichés = tiers réels avec watchItems filtrés. `tiers` reste la
     // source de vérité (drag, toggle fav, etc.) ; `filteredTiers` n'est
@@ -186,6 +191,7 @@ export function WatchlistBoard() {
 
     return (
         <>
+            <Stats watchItems={allWatchItems} />
             <SearchBar
                 query={searchQuery}
                 onQueryChange={setSearchQuery}

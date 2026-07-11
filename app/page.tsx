@@ -15,11 +15,7 @@ export default function Home() {
   const [tiers, setTiers] = useState<Tier[]>([]);
 
   const load = async () => {
-    const data = await getCategories();
-    const tiers = await getTiers();
     const items = await getWatchItem();
-    setCategories(data);
-    setTiers(tiers);
     setWatchItems(items);
   };
 
@@ -31,7 +27,6 @@ export default function Home() {
 
   return (
     <div className="app">
-      <Stats items={watchItems} />
       <WatchlistBoard />
       <Toaster richColors position="bottom-right" />
     </div>
