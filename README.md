@@ -12,14 +12,14 @@ Bobine est une application de watchlist cinématographique qui permet de suivre,
 
 ## 🛠️ Stack technique
 
-| Catégorie       | Technologie                     |
-|------------------|----------------------------------|
-| Framework        | Next.js                        |
-| Base de données  | SQLite                         |
-| ORM              | Prisma                         |
-| UI Components    | shadcn/ui (Base UI)             |
-| Animations       | Framer Motion                  |
-| Langage          | TypeScript                     |
+| Catégorie       | Technologie         |
+| --------------- | ------------------- |
+| Framework       | Next.js             |
+| Base de données | SQLite              |
+| ORM             | Prisma              |
+| UI Components   | shadcn/ui (Base UI) |
+| Animations      | Framer Motion       |
+| Langage         | TypeScript          |
 
 ## 🚀 Installation
 
@@ -89,16 +89,17 @@ bobine/
 
 ## 📝 Scripts disponibles
 
-| Commande              | Description                          |
-|------------------------|---------------------------------------|
-| `npm run dev`          | Lance le serveur de développement    |
-| `npm run build`        | Build de production                  |
-| `npm run start`        | Lance l'application en production    |
-| `npx prisma studio`    | Interface graphique pour la BDD      |
+| Commande            | Description                       |
+| ------------------- | --------------------------------- |
+| `npm run dev`       | Lance le serveur de développement |
+| `npm run build`     | Build de production               |
+| `npm run start`     | Lance l'application en production |
+| `npx prisma studio` | Interface graphique pour la BDD   |
 
 ## 🤝 Contribution
 
 Ce projet est développé et maintenu par [Yoann](#). Toute suggestion ou contribution est la bienvenue via issues ou pull requests.
 
 ## 📄 Licence
+
 Projet personnel — usage privé
