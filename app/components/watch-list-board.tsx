@@ -33,12 +33,17 @@ export function WatchlistBoard() {
     const [viewingItem, setViewingItem] = useState<WatchItem | null>(null);
 
     const load = async () => {
-        const [tiersData, categoriesData] = await Promise.all([
-            getTiers(),
-            getCategories(),
-        ]);
-        setTiers(tiersData);
-        setCategories(categoriesData);
+        try {
+            const [tiersData, categoriesData] = await Promise.all([
+                getTiers(),
+                getCategories(),
+            ]);
+            setTiers(tiersData);
+            setCategories(categoriesData);
+        } catch (error) {
+            console.error("Erreur lors du chargement :", error);
+            toast.error("Erreur de chargement des données.");
+        }
     };
 
     useEffect(() => {
@@ -46,8 +51,8 @@ export function WatchlistBoard() {
     }, []);
 
     const allWatchItems = useMemo(() => {
-    return tiers.flatMap((t) => t.watchItems ?? []);
-}, [tiers]);
+        return tiers.flatMap((t) => t.watchItems ?? []);
+    }, [tiers]);
 
     // Tiers affichés = tiers réels avec watchItems filtrés. `tiers` reste la
     // source de vérité (drag, toggle fav, etc.) ; `filteredTiers` n'est
@@ -62,7 +67,9 @@ export function WatchlistBoard() {
                 const matchesType = typeFilter === "tous" || item.type === typeFilter;
                 const matchesGenre =
                     genreFilter === "tous" ||
-                    (item.categories ?? []).some((c) => c.name === genreFilter);
+                    (item.categories ?? []).some((c) =>
+                        c.name.trim().toLowerCase() === genreFilter.trim().toLowerCase()
+                    );
                 return matchesQuery && matchesType && matchesGenre;
             }),
         }));
@@ -143,6 +150,7 @@ export function WatchlistBoard() {
         }
     };
 
+
     const handleMoveItem = async (
         itemId: number,
         fromTierId: number,
@@ -205,14 +213,20 @@ export function WatchlistBoard() {
                 onChange={setGenreFilter}
             />
 
-            <TierList
-                tiers={filteredTiers}
-                onToggleFav={handleToggleFav}
-                onEditItem={handleEditItem}
-                onViewItem={handleViewItem}
-                onReorderTier={handleReorderTier}
-                onMoveItem={handleMoveItem}
-            />
+            {tiers.length === 0 ? (
+                <div className="p-10 text-center">Aucune donnée trouvée en base.</div>
+            ) : filteredTiers.flatMap(t => t.watchItems).length === 0 ? (
+                <div className="p-10 text-center">Aucun élément ne correspond à vos filtres.</div>
+            ) : (
+                <TierList
+                    tiers={filteredTiers}
+                    onToggleFav={handleToggleFav}
+                    onEditItem={handleEditItem}
+                    onViewItem={handleViewItem}
+                    onReorderTier={handleReorderTier}
+                    onMoveItem={handleMoveItem}
+                />
+            )}
 
             <button
                 className="fab"

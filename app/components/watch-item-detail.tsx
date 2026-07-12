@@ -72,20 +72,12 @@ export default function WatchItemDetails({
                 </DialogHeader>
 
                 <div className="grid grid-cols-[140px_1fr] gap-5 mt-4">
-                    {item.posterUrl ? (
+                    {item.image && (
                         <img
-                            src={item.posterUrl}
+                            src={item.image}
                             alt={item.title}
                             className="w-full aspect-[2/3] object-cover rounded-lg"
                         />
-                    ) : (
-                        <div className="w-full aspect-[2/3] rounded-lg bg-muted flex items-center justify-center">
-                            {item.type === "film" ? (
-                                <Clapperboard className="h-8 w-8 text-muted-foreground" />
-                            ) : (
-                                <Tv className="h-8 w-8 text-muted-foreground" />
-                            )}
-                        </div>
                     )}
 
                     <div className="flex flex-col gap-3">
@@ -114,6 +106,16 @@ export default function WatchItemDetails({
                                 </Badge>
                             )}
                         </div>
+
+                        {/* --- AJOUT DU SYNOPSIS ICI --- */}
+                        {item.synopsis && (
+                            <div className="mt-2">
+                                <h4 className="text-sm font-semibold mb-1">Synopsis</h4>
+                                <p className="text-sm text-muted-foreground leading-relaxed">
+                                    {item.synopsis}
+                                </p>
+                            </div>
+                        )}
 
                         {error && (
                             <p className="text-sm text-destructive">{error}</p>

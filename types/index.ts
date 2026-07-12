@@ -9,10 +9,10 @@ export interface Category {
 export interface WatchItem {
     id: number;
     title: string;
+    synopsis: string;
     type: ItemType;
     favorite: boolean;
     image: string | null;
-    posterUrl: string | null;
     categories: Category[];
     tierId: number | null;
     tier?: Tier | null;
@@ -26,4 +26,10 @@ export interface Tier {
     order: number;
     score: number | null;
     watchItems?: WatchItem[];
+}
+
+export interface TierConfig {
+    key: string;
+    label: string;
+    score: number | null;
 }

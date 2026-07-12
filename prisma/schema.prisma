@@ -33,12 +33,12 @@ model Tier {
 
 model WatchItem {
   id         Int        @id @default(autoincrement())
-  title      String
+  title      String     @unique
   type       WatchType
+  synopsis   String
   favorite   Boolean    @default(false)
   position   Int        @default(0)
   image      String?
-  posterUrl  String?
   categories Category[]
   tierId     Int?
   tier       Tier?      @relation(fields: [tierId], references: [id], onDelete: SetNull)

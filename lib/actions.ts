@@ -91,21 +91,14 @@ export const getWatchItem = async () => {
 // -- parsing partagé entre création et modification --
 function parseWatchItemForm(formData: FormData) {
     const title = formData.get("title")?.toString().trim();
+    const synopsis = formData.get("synopsis")?.toString().trim() || "";
     const typeRaw = formData.get("type")?.toString();
     const categoryIdsRaw = formData.getAll("categoryIds[]").map(String);
     const tierIdRaw = formData.get("tierId")?.toString();
-    const posterUrl = formData.get("posterUrl")?.toString() || null;
+    const image = formData.get("image")?.toString() || null;
 
-    if (!title) {
-        throw new Error("Le titre est requis.");
-    }
-    if (typeRaw !== "film" && typeRaw !== "serie") {
-        throw new Error("Type invalide.");
-    }
-    // À ce stade, `typeRaw` vaut nécessairement "film" ou "serie" au
-    // runtime (l'exécution se serait arrêtée sinon), mais TypeScript ne
-    // peut pas rétrécir un `string` générique via une simple exclusion
-    // par égalité — d'où l'assertion explicite.
+    if (!title) throw new Error("Le titre est requis.");
+    if (typeRaw !== "film" && typeRaw !== "serie") throw new Error("Type invalide.");
     const type = typeRaw as ItemType;
 
     if (categoryIdsRaw.length === 0) {
@@ -114,8 +107,9 @@ function parseWatchItemForm(formData: FormData) {
 
     return {
         title,
+        synopsis,
         type,
-        posterUrl,
+        image,
         categoryIds: categoryIdsRaw.map(Number),
         tierId: tierIdRaw ? Number(tierIdRaw) : null,
     };

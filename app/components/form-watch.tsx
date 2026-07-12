@@ -29,6 +29,7 @@ import {
 import { Category, ItemType, Tier, WatchItem } from "@/types";
 import ImageDropzone from "./image-dropzone";
 import GenreMultiSelect from "./genre-multi-select";
+import { Textarea } from "@/components/ui/textarea";
 
 type Props = {
     open: boolean;
@@ -39,27 +40,30 @@ type Props = {
 
 interface FormState {
     title: string;
+    synopsis: string;
     type: ItemType;
     categoryIds: string[];
     tierId: string;
-    posterUrl: string;
+    image: string;
 }
 
 const EMPTY_FORM: FormState = {
     title: "",
+    synopsis: "",
     type: "film",
     categoryIds: [],
     tierId: "",
-    posterUrl: "",
+    image: "",
 };
 
 function itemToFormState(item: WatchItem): FormState {
     return {
         title: item.title,
+        synopsis: item.synopsis ?? "",
         type: item.type,
         categoryIds: (item.categories ?? []).map((c) => String(c.id)),
         tierId: item.tierId ? String(item.tierId) : "",
-        posterUrl: item.posterUrl ?? "",
+        image: item.image ?? "",
     };
 }
 
@@ -99,11 +103,12 @@ export default function FormWatch({ open, setOpen, item, onSuccess }: Props) {
 
         const formData = new FormData();
         formData.set("title", form.title.trim());
+        formData.set("synopsis", form.synopsis.trim());
         formData.set("type", form.type);
         form.categoryIds.forEach((id) => formData.append("categoryIds[]", id));
         selectedCategories.forEach((c) => formData.append("genres[]", c.name));
         if (form.tierId) formData.set("tierId", form.tierId);
-        if (form.posterUrl.trim()) formData.set("posterUrl", form.posterUrl.trim());
+        if (form.image.trim()) formData.set("image", form.image.trim());
         return formData;
     };
 
@@ -175,8 +180,8 @@ export default function FormWatch({ open, setOpen, item, onSuccess }: Props) {
                     <div className="flex flex-col gap-2">
                         <Label>Affiche</Label>
                         <ImageDropzone
-                            value={form.posterUrl}
-                            onChange={(value) => setForm((f) => ({ ...f, posterUrl: value }))}
+                            value={form.image}
+                            onChange={(value) => setForm((f) => ({ ...f, image: value }))}
                         />
                     </div>
 
@@ -188,6 +193,14 @@ export default function FormWatch({ open, setOpen, item, onSuccess }: Props) {
                             placeholder="Ex: Dune: Part Two"
                             value={form.title}
                             onChange={(e) => setForm((f) => ({ ...f, title: e.target.value }))}
+                        />
+                    </div>
+                    <div className="flex flex-col gap-2">
+                        <Label htmlFor="synopsis">Synopsis</Label>
+                        <Textarea
+                            id="synopsis"
+                            value={form.synopsis}
+                            onChange={(e) => setForm((f) => ({ ...f, synopsis: e.target.value }))}
                         />
                     </div>
 

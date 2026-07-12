@@ -1,22 +1,20 @@
+import { initialGenres } from "@/lib/mock-data";
 import { prisma } from "@/lib/prisma";
 
 export async function seedCategories() {
-    const categories = [
-        { name: "Drame" },
-        { name: "Science-fiction" },
-        { name: "Thriller" },
-        { name: "Animation" },
-        { name: "Cinéma africain" },
-        { name: "Comédie" },
-    ];
-
-    for (const category of categories) {
+    // 1. On itère sur les noms des genres
+    for (const genreName of initialGenres) {
         await prisma.category.upsert({
-            where: { name: category.name },
+            // On cherche par le nom
+            where: { name: genreName },
+            // S'il existe, on ne change rien
             update: {},
-            create: category,
+            // S'il n'existe pas, on le crée
+            create: { name: genreName },
         });
     }
 
-    console.log(`✅ ${categories.length} catégories créées`);
+    // 2. Pour loguer le nombre, on récupère le total en base
+    const count = await prisma.category.count();
+    console.log(`✅ ${count} catégories sont présentes en base.`);
 }

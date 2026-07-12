@@ -10,21 +10,6 @@ import { WatchlistBoard } from "./components/watch-list-board";
 
 export default function Home() {
 
-  const [categories, setCategories] = useState<Category[]>([]);
-  const [watchItems, setWatchItems] = useState<WatchItem[]>([]);
-  const [tiers, setTiers] = useState<Tier[]>([]);
-
-  const load = async () => {
-    const items = await getWatchItem();
-    setWatchItems(items);
-  };
-
-  useEffect(() => {
-    load()
-  }, []);
-
-
-
   return (
     <div className="app">
       <WatchlistBoard />
