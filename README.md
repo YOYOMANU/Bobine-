@@ -1,36 +1,104 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# 🎬 Bobine
 
-## Getting Started
+Bobine est une application de watchlist cinématographique qui permet de suivre, organiser et prioriser les films et séries que tu veux regarder — avec une expérience fluide et interactive.
 
-First, run the development server:
+## ✨ Fonctionnalités
+
+- 📌 Ajouter des films/séries à ta watchlist
+- 🔀 Réorganisation par glisser-déposer (drag-and-drop) grâce à Framer Motion (`Reorder`)
+- ⚡ Interface réactive avec mises à jour optimistes (optimistic UI) — les actions s'affichent instantanément sans attendre la réponse serveur
+- 🎨 UI moderne construite avec shadcn/ui (variante Base UI)
+- 💾 Persistance des données via Prisma ORM et SQLite
+
+## 🛠️ Stack technique
+
+| Catégorie       | Technologie                     |
+|------------------|----------------------------------|
+| Framework        | Next.js                        |
+| Base de données  | SQLite                         |
+| ORM              | Prisma                         |
+| UI Components    | shadcn/ui (Base UI)             |
+| Animations       | Framer Motion                  |
+| Langage          | TypeScript                     |
+
+## 🚀 Installation
+
+### Prérequis
+
+- Node.js (v18 ou supérieur recommandé)
+- npm, yarn ou pnpm
+
+### Étapes
+
+```bash
+# Cloner le projet
+git clone https://github.com/YOYOMANU/Bobine-
+cd bobine
+
+# Installer les dépendances
+npm install
+
+# Configurer les variables d'environnement
+cp .env.example .env
+```
+
+Renseigne les variables nécessaires dans `.env`, notamment l'URL de la base de données :
+
+```env
+DATABASE_URL="file:./dev.db"
+```
+
+### Base de données
+
+```bash
+# Appliquer les migrations Prisma
+npx prisma migrate dev
+
+# (optionnel) Générer le client Prisma
+npx prisma generate
+```
+
+### Lancer le projet
 
 ```bash
 npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+L'application sera accessible sur [http://localhost:3000](http://localhost:3000).
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+## 📁 Structure du projet
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+```
+bobine/
+├── prisma/
+│   ├── schema.prisma       # Schéma de la base de données
+│   └── migrations/         # Historique des migrations
+├── app/                     # Routes et pages Next.js
+├── components/
+│   ├── ui/                 # Composants shadcn/ui
+│   └── ...                 # Composants métier (watchlist, drag-and-drop, etc.)
+├── lib/                     # Utilitaires, client Prisma, helpers
+└── public/                  # Assets statiques
+```
 
-## Learn More
+## 🧩 Points d'implémentation notables
 
-To learn more about Next.js, take a look at the following resources:
+- **Drag-and-drop** : utilisation du composant `Reorder` de Framer Motion pour permettre de réordonner la watchlist de façon fluide et animée.
+- **Optimistic UI** : les actions (ajout, suppression, réordonnancement) mettent à jour l'état local immédiatement, puis sont synchronisées en arrière-plan avec la base de données via Prisma.
+- **Migrations Prisma** : le schéma évolue via des migrations versionnées, permettant de suivre les changements de structure de la base SQLite.
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+## 📝 Scripts disponibles
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+| Commande              | Description                          |
+|------------------------|---------------------------------------|
+| `npm run dev`          | Lance le serveur de développement    |
+| `npm run build`        | Build de production                  |
+| `npm run start`        | Lance l'application en production    |
+| `npx prisma studio`    | Interface graphique pour la BDD      |
 
-## Deploy on Vercel
+## 🤝 Contribution
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+Ce projet est développé et maintenu par [Yoann](#). Toute suggestion ou contribution est la bienvenue via issues ou pull requests.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
+## 📄 Licence
+Projet personnel — usage privé
